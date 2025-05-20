@@ -20,6 +20,10 @@ namespace YongAnFrame.Features.Roles.Properties
         /// </summary>
         public int MaxPlayer { get; set; } = 1000;
         /// <summary>
+        /// 获取或设置生成时播放音频路径
+        /// </summary>
+        public string? MusicNamePath { get; set; } = null;
+        /// <summary>
         /// 获取或设置生成时播放音频文件
         /// </summary>
         public string? MusicNameName { get; set; } = null;
