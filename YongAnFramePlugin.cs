@@ -1,7 +1,6 @@
 ﻿using Exiled.API.Enums;
 using Exiled.API.Features;
 using HarmonyLib;
-using SCPSLAudioApi;
 using System;
 using YongAnFrame.Features.Players;
 using YongAnFrame.Features.Roles;
@@ -45,7 +44,6 @@ namespace YongAnFrame
             Log.Info("============System============");
             FramePlayer.SubscribeStaticEvents();
             CustomRolePlus.SubscribeStaticEvents();
-            Startup.SetupDependencies();
             AddLogPatch.StartTask();
             Harmony.PatchAll();
             base.OnEnabled();
