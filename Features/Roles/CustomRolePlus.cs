@@ -1,4 +1,5 @@
-﻿using Exiled.API.Features;
+using AudioApi.AudioCore.Dummies;
+using Exiled.API.Features;
 using Exiled.API.Features.DamageHandlers;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomRoles.API;
@@ -118,9 +119,10 @@ namespace YongAnFrame.Features.Roles
                 fPlayer.ExPlayer.ChangeEffectIntensity(Exiled.API.Enums.EffectType.MovementBoost, (byte)((BaseProperties.BaseMovementSpeedMultiplier - 1f) * 100));
             }
             if (!string.IsNullOrEmpty(SpawnProperties.Info)) Cassie.MessageTranslated($""/*ADMINISTER TEAM DESIGNATED {CASSIEDeathName} HASENTERED*/, SpawnProperties.Info, true, true, true);
-            if (!string.IsNullOrEmpty(SpawnProperties.MusicNameName))
+            if (!string.IsNullOrEmpty(SpawnProperties.MusicNamePath) && !string.IsNullOrEmpty(SpawnProperties.MusicNameName))
             {
-                MusicManager.Play(SpawnProperties.MusicNameName!, $"{Name}");
+                VoiceDummy.Add(fPlayer.ExPlayer.Id + 255, $"{Name}");
+                VoiceDummy.Play(fPlayer.ExPlayer.Id + 255,SpawnProperties.MusicNamePath!, SpawnProperties.MusicNameName!);
             }
             fPlayer.UpdateShowInfo();
             Log.Info($"已为{fPlayer.ExPlayer.Nickname}添加{Name}({Id})角色");
@@ -148,6 +150,7 @@ namespace YongAnFrame.Features.Roles
             FramePlayer fPlayer = player.ToFPlayer();
             if (fPlayer is not null)
             {
+                VoiceDummy.Remove(player.Id + 255);
                 RemoveRole(player.ToFPlayer());
             }
         }
@@ -158,6 +161,7 @@ namespace YongAnFrame.Features.Roles
         public virtual void RemoveRole(FramePlayer fPlayer)
         {
             if (!Check(fPlayer)) return;
+            VoiceDummy.Remove(fPlayer.ExPlayer.Id + 255);
             if (Check(fPlayer, out DataProperties data) && !data.IsDeathHandling)
             {
                 Cassie.MessageTranslated($"Died", $"{Name}游玩二游被榨干而死(非常正常死亡)");
