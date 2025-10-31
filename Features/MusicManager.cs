@@ -149,11 +149,11 @@ namespace YongAnFrame.Features
                     {
                         if (distance == 0)
                         {
-                            voicePlayerBase.BroadcastTo.Add(npc.PlayerId);
+                            voicePlayerBase.BroadcastTo.Add(npc);
                         }
                         else
                         {
-                            voicePlayerBase.BroadcastTo = [.. FramePlayer.List.Where(p => Vector3.Distance(p.ExPlayer!.Position, source.ExPlayer!.Position) <= distance).Select((s) => s.ExPlayer!.Id)];
+                            voicePlayerBase.BroadcastTo = [.. FramePlayer.List.Where(p => Vector3.Distance(p.ExPlayer!.Position, source.ExPlayer!.Position) <= distance).Select((s) => s)];
                         }
                     }
 
@@ -161,9 +161,9 @@ namespace YongAnFrame.Features
                     {
                         foreach (var player in extraPlay)
                         {
-                            if (!voicePlayerBase.BroadcastTo.Contains(player.ExPlayer.Id))
+                            if (!voicePlayerBase.BroadcastTo.Contains(player))
                             {
-                                voicePlayerBase.BroadcastTo.Add(player.ExPlayer.Id);
+                                voicePlayerBase.BroadcastTo.Add(player);
                             }
                         }
                     }

@@ -29,7 +29,7 @@ namespace YongAnFrame.Features.Roles
         /// <summary>
         /// 不要修改这个值
         /// </summary>
-        public override bool IgnoreSpawnSystem { get; set; } = false;
+        public override bool IgnoreSpawnSystem { get; set; } = true;
         /// <summary>
         /// 获取禁用的自定义角色生成
         /// </summary>

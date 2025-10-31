@@ -419,5 +419,12 @@ namespace YongAnFrame.Features.Players
         /// </summary>
         /// <param name="yPlayer">框架玩家</param>
         public static implicit operator Player(FramePlayer yPlayer) => yPlayer.ExPlayer;
+
+        /// <summary>
+        /// 隐性转换
+        /// </summary>
+        /// <param name="yPlayer">框架玩家</param>
+        public static implicit operator ReferenceHub(FramePlayer yPlayer) => yPlayer;
+        
     }
 }
