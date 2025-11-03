@@ -14,6 +14,21 @@ namespace YongAnFrame
         public bool IsEnabled { get; set; } = true;
         ///<inheritdoc/>
         public bool Debug { get; set; }
+
+        [Description("是否MySql数据库异常时踢出玩家")]
+        public bool IsMySqlErrorKick { get; set; } = true;
+        [Description("MySql数据库服务器")]
+        public string MySqlServer { get; set; } = "localhost";
+
+        [Description("MySql数据库用户")]
+        public string MySqlUser { get; set; } = "root";
+
+        [Description("MySql数据库密码")]
+        public string MySqlPassword { get; set; } = "root";
+
+        [Description("MySql数据库数据表名称")]
+        public string MySqlDatabaseName { get; set; } = "test";
+
         /// <summary>
         /// 获取或设置全局的经验加成
         /// </summary>

@@ -10,7 +10,6 @@ using Exiled.Loader;
 using PlayerRoles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using YongAnFrame.Extensions;
 using YongAnFrame.Features.Players;
 using YongAnFrame.Features.Roles.Enums;
@@ -175,7 +174,7 @@ namespace YongAnFrame.Features.Roles
             {
                 RemoveRole(player.ToFPlayer());
             }
-            catch (InvalidCastException){ }
+            catch (InvalidCastException) { }
         }
         /// <summary>
         /// 给玩家移除这个角色

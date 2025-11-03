@@ -8,7 +8,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <NeutralLanguage>zh-Hans</NeutralLanguage>
     <SignAssembly>False</SignAssembly>
-    <VersionPrefix>1.0.0-beta6</VersionPrefix>
+    <VersionPrefix>1.0.0-beta7</VersionPrefix>
     <Authors>YongAn404</Authors>
     <Company>$(Authors)</Company>
     <Copyright>Copyright © YongAn404</Copyright>
@@ -55,6 +55,7 @@
     <PackageReference Include="ExMod.Exiled" Version="9.10.0" />
     <PackageReference Include="Lib.Harmony" Version="2.4.1" />
     <PackageReference Include="MengXinSheQu.AudioApi" Version="0.0.6" />
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp-firstpass">

@@ -3,7 +3,6 @@ using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
 using YongAnFrame.Extensions;
 using YongAnFrame.Features.Players;
 using YongAnFrame.Features.UI.Enums;
@@ -78,9 +77,9 @@ namespace YongAnFrame.Commands
                     return false;
                 }
 
-                foreach (FramePlayer yPlayer in choicePlayer)
+                foreach (FramePlayer framePlayer in choicePlayer)
                 {
-                    yPlayer.UI.MessageList.Add(new MessageText($"{arguments.Array[2]}", duration, MessageType.Admin));
+                    framePlayer.UI.MessageList.Add(new MessageText($"{arguments.Array[2]}", duration, MessageType.Admin));
                 }
                 response = "已成功运行";
                 return true;

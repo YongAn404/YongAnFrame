@@ -53,7 +53,7 @@ namespace YongAnFrame.Features.Players
         /// <summary>
         /// 隐性转换
         /// </summary>
-        /// <param name="yPlayer">自定义玩家</param>
-        public static implicit operator FramePlayer(CustomPlayer yPlayer) => yPlayer.FramePlayer;
+        /// <param name="customPlayer">自定义玩家</param>
+        public static implicit operator FramePlayer(CustomPlayer customPlayer) => customPlayer.FramePlayer;
     }
 }

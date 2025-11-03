@@ -1,10 +1,10 @@
 ﻿using Exiled.API.Features;
-using Exiled.CustomRoles;
 using Exiled.CustomRoles.API;
 using Exiled.CustomRoles.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.Features;
 using MEC;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,9 +34,9 @@ namespace YongAnFrame.Features.Players
         /// 在运行<seealso cref="Events.Handlers.FramePlayer.FramePlayerInvalidating"/>事件后实例无效，再调用可能会引发<seealso cref="InvalidCastException"/>异常<br/>
         /// 玩家退出后必须不再引用<seealso cref="Player"/>，否则会造成<seealso cref="Player"/>数字ID重复的问题
         /// </remarks>
-        public Player ExPlayer 
+        public Player ExPlayer
         {
-            get 
+            get
             {
                 if (exPlayer is null)
                 {
@@ -89,6 +89,9 @@ namespace YongAnFrame.Features.Players
         /// 获取或设置玩家的经验倍率
         /// </summary>
         public float ExpMultiplier { get; set; }
+
+        public List<PlayerTitle> PosTitles { get; private set; } = [];
+
         /// <summary>
         /// 获取或设置玩家的批准绕过DNT
         /// </summary>
@@ -386,11 +389,11 @@ namespace YongAnFrame.Features.Players
             {
                 throw new InvalidCastException("Player实例无效");
             }
-            if (!dictionary.TryGetValue(player.Id, out FramePlayer yPlayer))
+            if (!dictionary.TryGetValue(player.Id, out FramePlayer framePlayer))
             {
                 throw new InvalidCastException("FramePlayer实例无效");
             }
-            return yPlayer;
+            return framePlayer;
         }
 
         /// <summary>
@@ -401,12 +404,152 @@ namespace YongAnFrame.Features.Players
         public static FramePlayer Get(int numId) => Get(Player.Get(numId));
 
         /// <summary>
+        /// 不推荐直接访问，请尝试使用ToFPlayer()
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public static FramePlayer? Load(Player player)
+        {
+            if (player.IsNPC)
+            {
+                return new(player.ToFPlayer())
+                {
+                    Level = 1,
+                    Exp = 0,
+                    PosTitles = [],
+                    UsingTitles = null,
+                    UsingRankTitles = null,
+                };
+            }
+
+            FramePlayer? framePlayer = null;
+
+            string queryString = "select * from player_data where Id = @Id";
+            try
+            {
+                using MySqlConnection connection = new(YongAnFramePlugin.Instance.ConnectionString);
+                connection.Open();
+                using MySqlCommand command = new(queryString, connection);
+                command.Parameters.AddWithValue("Id", player.UserId);
+                using MySqlDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    List<PlayerTitle> posTitles = [];
+                    if (reader["PosTitles"].ToString() != "")
+                    {
+                        foreach (string posTitleIdString in reader["PosTitles"].ToString().Split(','))
+                        {
+                            PlayerTitle? title = PlayerTitle.Get(uint.Parse(posTitleIdString));
+                            if (title != null)
+                            {
+                                posTitles.Add(title);
+                            }
+                        }
+                    }
+                    framePlayer = new(player)
+                    {
+                        Level = (ulong)reader["Level"],
+                        Exp = (ulong)reader["Exp"],
+                        ExpMultiplier = (float)reader["ExpMultiplier"],
+                        PosTitles = posTitles,
+                        UsingTitles = PlayerTitle.Get((uint)reader["UsingTitles"]),
+                        UsingRankTitles = PlayerTitle.Get((uint)reader["UsingRankTitles"]),
+                    };
+                }
+            }
+            catch (Exception text)
+            {
+                Log.Error($"数据库查找FramePlayer数据异常({player.UserId}) 错误原因:{text}");
+                if (YongAnFramePlugin.Instance.Config.IsMySqlErrorKick)
+                {
+                    player.Kick("不要慌张！你的数据库数据可能存在异常，为了保证你的游戏数据不被覆盖，你已被踢出服务器!\n请将错误联系到管理员(数据库查找FramePlayer数据异常)");
+                }
+                return null;
+            }
+
+            if (framePlayer == null)
+            {
+                framePlayer = new(player)
+                {
+                    Level = 1,
+                    Exp = 0,
+                    ExpMultiplier = 1,
+                    PosTitles = [],
+                    UsingTitles = null,
+                    UsingRankTitles = null,
+                };
+                try
+                {
+                    using MySqlConnection connection = new(YongAnFramePlugin.Instance.ConnectionString);
+                    connection.Open();
+                    using MySqlCommand cmd = new("insert into player_data set Id=@Id,Level=@Level,Exp=@Exp,ExpMultiplier=@ExpMultiplier,PosTitles=@PosTitles,UsingTitles=@UsingTitles,UsingRankTitles=@UsingRankTitles", connection);
+                    cmd.Parameters.AddWithValue("Id", framePlayer.ExPlayer.UserId);
+                    cmd.Parameters.AddWithValue("Level", framePlayer.Level);
+                    cmd.Parameters.AddWithValue("Exp", framePlayer.Exp);
+                    cmd.Parameters.AddWithValue("ExpMultiplier", framePlayer.ExpMultiplier);
+                    string posTitleString = "";
+                    foreach (var item in framePlayer.PosTitles)
+                    {
+                        posTitleString += $",{item.Id}";
+                    }
+                    if (posTitleString.Length > 0)
+                        posTitleString.Remove(0, 1);
+
+                    cmd.Parameters.AddWithValue("PosTitles", posTitleString);
+                    cmd.Parameters.AddWithValue("UsingTitles", framePlayer.UsingTitles != null ? framePlayer.UsingTitles.Id : 0);
+                    cmd.Parameters.AddWithValue("UsingRankTitles", framePlayer.UsingRankTitles != null ? framePlayer.UsingRankTitles.Id : 0);
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception text)
+                {
+                    Log.Error("数据库插入数据异常 错误原因:" + text);
+                    return null;
+                }
+            }
+            return framePlayer;
+        }
+
+        public bool Save()
+        {
+            if (ExPlayer.IsNPC || (!IsBDNT && ExPlayer.DoNotTrack)) return false;
+
+            try
+            {
+                using MySqlConnection connection = new(YongAnFramePlugin.Instance.ConnectionString);
+                connection.Open();
+                using MySqlCommand cmd = new("update player_data set Level=@Level,Exp=@Exp,ExpMultiplier=@ExpMultiplier,PosTitles=@PosTitles,UsingTitles=@UsingTitles,UsingRankTitles=@UsingRankTitles where Id=@Id", connection);
+                cmd.Parameters.AddWithValue("Id", ExPlayer.UserId);
+                cmd.Parameters.AddWithValue("Exp", Exp);
+                cmd.Parameters.AddWithValue("ExpMultiplier", ExpMultiplier);
+                cmd.Parameters.AddWithValue("Level", Level);
+                string posTitleString = "";
+                foreach (var item in PosTitles)
+                {
+                    posTitleString += $",{item.Id}";
+                }
+                if (posTitleString.Length > 0)
+                    posTitleString.Remove(0, 1);
+                cmd.Parameters.AddWithValue("PosTitles", posTitleString);
+                cmd.Parameters.AddWithValue("UsingTitles", UsingTitles != null ? UsingTitles.Id : 0);
+                cmd.Parameters.AddWithValue("UsingRankTitles", UsingRankTitles != null ? UsingRankTitles.Id : 0);
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception text)
+            {
+                Log.Error("数据库数据更新异常 错误原因:" + text);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 调用后该实例会立刻无效<br/>
         /// 调用后该实例会立刻无效<br/>
         /// 调用后该实例会立刻无效
         /// </summary>
         public void Invalid()
         {
+            Save();
             Events.Handlers.FramePlayer.OnFramePlayerInvalidating(new FramePlayerInvalidatingEventArgs(this));
             CustomRolePlus?.RemoveRole(this);
             dictionary.Remove(ExPlayer.Id);
@@ -417,14 +560,14 @@ namespace YongAnFrame.Features.Players
         /// <summary>
         /// 隐性转换
         /// </summary>
-        /// <param name="yPlayer">框架玩家</param>
-        public static implicit operator Player(FramePlayer yPlayer) => yPlayer.ExPlayer;
+        /// <param name="framePlayer">框架玩家</param>
+        public static implicit operator Player(FramePlayer framePlayer) => framePlayer.ExPlayer;
 
         /// <summary>
         /// 隐性转换
         /// </summary>
-        /// <param name="yPlayer">框架玩家</param>
-        public static implicit operator ReferenceHub(FramePlayer yPlayer) => yPlayer;
-        
+        /// <param name="framePlayer">框架玩家</param>
+        public static implicit operator ReferenceHub(FramePlayer framePlayer) => framePlayer;
+
     }
 }

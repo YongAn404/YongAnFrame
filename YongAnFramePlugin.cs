@@ -18,8 +18,8 @@ namespace YongAnFrame
         /// <summary>
         /// 获取<seealso cref="YongAnFramePlugin"/>单例
         /// </summary>
-        public static YongAnFramePlugin Instance 
-        { 
+        public static YongAnFramePlugin Instance
+        {
             get
             {
                 if (instance is null)
@@ -29,6 +29,10 @@ namespace YongAnFrame
                 return instance;
             }
         }
+
+        public string ConnectionString => $"server={Config.MySqlServer}; User Id = {Config.MySqlUser} ;Password = {Config.MySqlPassword} ;Database = {Config.MySqlDatabaseName};Charset = utf8";
+
+
         /// <summary>
         /// 获取<seealso cref="HarmonyLib.Harmony"/>实例
         /// </summary>
@@ -45,7 +49,7 @@ namespace YongAnFrame
             PathManager.CheckPath();
             FramePlayer.SubscribeStaticEvents();
             CustomRolePlus.SubscribeStaticEvents();
-            AddLogPatch.StartTask();
+            //AddLogPatch.StartTask();
             Harmony.PatchAll();
             base.OnEnabled();
         }

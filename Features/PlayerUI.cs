@@ -37,7 +37,7 @@ namespace YongAnFrame.Features
         #region Hint
         private readonly Hint versionHint = new()
         {
-            Text = "YongAnFrame 1.0.0-beta6+002",
+            Text = "YongAnFrame 1.0.0-beta7",
             FontSize = 20,
             Alignment = HintAlignment.Center,
             YCoordinateAlign = HintVerticalAlign.Top,
@@ -163,7 +163,7 @@ namespace YongAnFrame.Features
             MessageList = new(7, UpdateMessageUI);
             ChatList = new(7, UpdateChatUI);
             coroutine = Timing.RunCoroutine(Timer());
-            PlayerDisplay = PlayerDisplay.Get(referenceHub:fPlayer);
+            PlayerDisplay = PlayerDisplay.Get(referenceHub: fPlayer);
             PlayerDisplay.AddHint(customRoleHint);
             PlayerDisplay.AddHint(chatHint);
             PlayerDisplay.AddHint(messageHint);

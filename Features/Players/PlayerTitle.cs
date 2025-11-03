@@ -1,4 +1,5 @@
 ﻿using Exiled.API.Features;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 
@@ -14,10 +15,7 @@ namespace YongAnFrame.Features.Players
         /// 获取有效的玩家称号列表
         /// </summary>
         public static IReadOnlyCollection<PlayerTitle> List => [.. dictionary.Values];
-        /// <summary>
-        /// 获取或设置加载称号委托
-        /// </summary>
-        public static Func<uint, PlayerTitle?>? LoadFunc { get; set; }
+
         /// <summary>
         /// 获取或设置称号的ID
         /// </summary>
@@ -81,19 +79,91 @@ namespace YongAnFrame.Features.Players
         /// <returns>获取的称号</returns>
         public static PlayerTitle? Get(uint id)
         {
-            if (LoadFunc is null)
-            {
-                Log.Error("称号功能无法在框架内获取，请设置PlayerTitle.LoadFunc属性或写个缓存");
-                return null;
-            }
-
             if (dictionary.TryGetValue(id, out PlayerTitle? title))
             {
                 return title;
             }
-            title = LoadFunc.Invoke(id);
             if (title != null) dictionary.Add(id, title);
             return title;
+        }
+
+        public static PlayerTitle? Load(uint Id)
+        {
+            string queryString = "select * from title_data where Id = @Id";
+            try
+            {
+                using MySqlConnection connection = new(YongAnFramePlugin.Instance.ConnectionString);
+                connection.Open();
+
+                using MySqlCommand command = new(queryString, connection);
+                command.Parameters.AddWithValue("@Id", Id);
+
+                using MySqlDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    return new(Id, reader["Name"].ToString(), reader["Color"].ToString(), (byte)reader["Pro"] != 0, reader["DynamicCommand"].ToString());
+                }
+                return null;
+            }
+            catch (Exception text)
+            {
+                Log.Error("数据库查找异常 错误原因:" + text);
+                return null;
+            }
+        }
+
+        public bool Insert(string? dynamicCommand)
+        {
+            try
+            {
+                using MySqlConnection connection = new(YongAnFramePlugin.Instance.ConnectionString);
+                connection.Open();
+                using MySqlCommand cmd = new("insert into title_data set Id=@Id,Name=@Name,Color=@Color,Pro=@Pro,DynamicCommand=@DynamicCommand", connection);
+                Id = (uint)cmd.LastInsertedId;
+                cmd.Parameters.AddWithValue("Id", Id);
+                cmd.Parameters.AddWithValue("Name", Name);
+                cmd.Parameters.AddWithValue("Color", Color);
+                cmd.Parameters.AddWithValue("Pro", IsRank ? 1 : 0);
+                cmd.Parameters.AddWithValue("DynamicCommand", dynamicCommand);
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception text)
+            {
+                Log.Error("数据库插入数据异常 错误原因:" + text);
+                return false;
+            }
+        }
+        public bool Update()
+        {
+            try
+            {
+                using MySqlConnection connection = new(YongAnFramePlugin.Instance.ConnectionString);
+                connection.Open();
+                using MySqlCommand cmd = new("update title_data set Name=@Name,Color=@Color,Pro=@Pro,DynamicCommand=@DynamicCommand where Id=@Id", connection);
+                cmd.Parameters.AddWithValue("Id", (uint)cmd.LastInsertedId);
+                cmd.Parameters.AddWithValue("Name", Name);
+                cmd.Parameters.AddWithValue("Color", Color);
+                cmd.Parameters.AddWithValue("Pro", IsRank ? 1 : 0);
+                string? dynamicString = null;
+                if (DynamicCommand is not null)
+                {
+                    foreach (var command in DynamicCommand)
+                    {
+                        dynamicString = string.Join(",", command) + ";";
+                    }
+                    dynamicString = dynamicString?.Substring(0, dynamicString.Length - 1);
+                }
+
+                cmd.Parameters.AddWithValue("DynamicCommand", dynamicString);
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception text)
+            {
+                Log.Error("数据库数据更新异常 错误原因:" + text);
+                return false;
+            }
         }
     }
 }

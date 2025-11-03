@@ -35,7 +35,7 @@ namespace YongAnFrame.Features
         {
             if (trackEventDic.TryGetValue(args.VoicePlayerBase, out TrackEvent trackEvent))
             {
-                 trackEvent.PlayMusicAction?.Invoke(args);
+                trackEvent.PlayMusicAction?.Invoke(args);
             }
         }
 
@@ -45,7 +45,7 @@ namespace YongAnFrame.Features
             {
                 trackEvent.StopMusicAction?.Invoke(args);
             }
-            
+
         }
 
         private static ReferenceHub CreateMusicNpc(string name)

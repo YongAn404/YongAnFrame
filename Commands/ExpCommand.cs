@@ -19,7 +19,7 @@ namespace YongAnFrame.Commands
         /// <summary>
         /// 次要指令名
         /// </summary>
-        public string[] Aliases => ["pexp","pe"];
+        public string[] Aliases => ["pexp", "pe"];
         /// <summary>
         /// 指令描述
         /// </summary>
