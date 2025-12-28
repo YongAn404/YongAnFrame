@@ -1,4 +1,4 @@
-﻿using CommandSystem;
+using CommandSystem;
 using Exiled.API.Features;
 using System;
 using YongAnFrame.Extensions;
@@ -24,7 +24,7 @@ namespace SyncPlugin.Commands.Chats
                 {
                     foreach (var player1 in Player.Get(player.Role.Side))
                     {
-                        player1.ToFPlayer().UI.ChatList.Add(new ChatText(arguments.Array[1], 10, ChatType.All, player.ToFPlayer()));
+                        player1.ToFPlayer().UI.ChatList.Add(new ChatText(arguments.Array[1], 10, ChatType.Team, player.ToFPlayer()));
                     }
                     response = "OK";
                     return true;

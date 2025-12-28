@@ -1,4 +1,4 @@
-﻿using Exiled.API.Features;
+using Exiled.API.Features;
 using Exiled.API.Features.DamageHandlers;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomRoles.API;
@@ -135,7 +135,7 @@ namespace YongAnFrame.Features.Roles
                 fPlayer.ExPlayer.EnableEffect(Exiled.API.Enums.EffectType.MovementBoost);
                 fPlayer.ExPlayer.ChangeEffectIntensity(Exiled.API.Enums.EffectType.MovementBoost, (byte)((BaseProperties.BaseMovementSpeedMultiplier - 1f) * 100));
             }
-            if (!string.IsNullOrEmpty(SpawnProperties.Info)) Cassie.MessageTranslated($""/*ADMINISTER TEAM DESIGNATED {CASSIEDeathName} HASENTERED*/, SpawnProperties.Info, true, true, true);
+            if (!string.IsNullOrEmpty(SpawnProperties.Info)) Exiled.API.Features.Cassie.MessageTranslated($""/*ADMINISTER TEAM DESIGNATED {CASSIEDeathName} HASENTERED*/, SpawnProperties.Info, true, true, true);
             if (!string.IsNullOrEmpty(SpawnProperties.MusicNameName))
             {
                 MusicManager.Play(SpawnProperties.MusicNameName!, $"{Name}");
@@ -186,7 +186,7 @@ namespace YongAnFrame.Features.Roles
             {
                 if (!data.IsDeathHandling)
                 {
-                    Cassie.MessageTranslated($"Died", $"{Name}游玩二游被榨干而死(非常正常死亡)");
+                    Exiled.API.Features.Cassie.MessageTranslated($"Died", $"{Name}游玩二游被榨干而死(非常正常死亡)");
                 }
                 base.RemoveRole(fPlayer.ExPlayer);
                 BaseData.Remove(fPlayer);
@@ -339,7 +339,7 @@ namespace YongAnFrame.Features.Roles
             {
                 if (args.Attacker is null)
                 {
-                    Cassie.MessageTranslated($"Died", $"{Name}被充满恶意的游戏环境草飞了");
+                    Exiled.API.Features.Cassie.MessageTranslated($"Died", $"{Name}被充满恶意的游戏环境草飞了");
                     data.IsDeathHandling = true;
                 }
                 else
@@ -349,16 +349,16 @@ namespace YongAnFrame.Features.Roles
                         CustomRole customRole = args.Attacker.GetCustomRoles()[0];
                         if (RoleDeathText.TryGetValue(customRole.Id, out string text))
                         {
-                            Cassie.MessageTranslated($"Died", text.Replace("{Name}", Name).Replace("{Attacker}", customRole.Name));
+                            Exiled.API.Features.Cassie.MessageTranslated($"Died", text.Replace("{Name}", Name).Replace("{Attacker}", customRole.Name));
                         }
                         else
                         {
-                            Cassie.MessageTranslated($"Died", $"({Name})被({customRole.Name})斩杀");
+                            Exiled.API.Features.Cassie.MessageTranslated($"Died", $"({Name})被({customRole.Name})斩杀");
                         }
                     }
                     else
                     {
-                        Cassie.MessageTranslated($"Died", $"({Name})被({args.Attacker.Nickname})斩杀");
+                        Exiled.API.Features.Cassie.MessageTranslated($"Died", $"({Name})被({args.Attacker.Nickname})斩杀");
                     }
                 }
                 data.IsDeathHandling = true;

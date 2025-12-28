@@ -1,4 +1,4 @@
-﻿using CommandSystem;
+using CommandSystem;
 using Exiled.API.Features;
 using PlayerStatsSystem;
 using System;
@@ -8,11 +8,11 @@ namespace SyncPlugin.Commands
     [CommandHandler(typeof(ClientCommandHandler))]
     public class KillCommand : ICommand
     {
-        public string Command => "debug";
+        public string Command => "killme";
 
-        public string[] Aliases => ["kill", "db"];
+        public string[] Aliases => ["kill", "s"];
 
-        public string Description => "debug指令";
+        public string Description => "自杀指令";
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (Player.TryGet(sender, out Player player))

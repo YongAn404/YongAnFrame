@@ -1,4 +1,4 @@
-﻿using Exiled.API.Interfaces;
+using Exiled.API.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using YongAnFrame.Features.Roles;
@@ -43,5 +43,14 @@ namespace YongAnFrame
         /// </remarks>
         [Description("禁用自定义角色生成(只能用于继承CustomRolePlus的类)")]
         public List<string> DisableCustomRolePlus { get; set; } = ["114514", "1"];
+
+        /// <summary>
+        /// 获取或设置禁用指令
+        /// </summary>
+        /// <remarks>
+        /// 只能用于继承<seealso cref="CustomRolePlus"/>的类
+        /// </remarks>
+        [Description("禁用指令")]
+        public List<string> DisableCommand { get; set; } = ["AChatCommand", "1"];
     }
 }

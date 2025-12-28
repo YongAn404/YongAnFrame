@@ -1,4 +1,4 @@
-﻿using Exiled.API.Features;
+using Exiled.API.Features;
 using Exiled.CustomRoles.API;
 using Exiled.CustomRoles.API.Features;
 using Exiled.Events.EventArgs.Player;
@@ -89,13 +89,15 @@ namespace YongAnFrame.Features.Players
         /// 获取或设置玩家的经验倍率
         /// </summary>
         public float ExpMultiplier { get; set; }
-
-        public List<PlayerTitle> PosTitles { get; private set; } = [];
-
         /// <summary>
         /// 获取或设置玩家的批准绕过DNT
         /// </summary>
-        public bool IsBDNT { get; set; }
+        public bool IsBDNT { get; set; } = false;
+        /// <summary>
+        /// 获取玩家是否无效
+        /// </summary>
+        public bool IsInvalid => exPlayer is null;
+        public List<PlayerTitle> PosTitles { get; private set; } = [];
         /// <summary>
         /// 获取或设置玩家正在使用的名称称号
         /// </summary>
@@ -185,18 +187,21 @@ namespace YongAnFrame.Features.Players
         /// </summary>
         public static void UnsubscribeStaticEvents()
         {
-            Exiled.Events.Handlers.Player.Verified += new CustomEventHandler<VerifiedEventArgs>(OnStaticVerified);
-            Exiled.Events.Handlers.Player.Destroying += new CustomEventHandler<DestroyingEventArgs>(OnStaticDestroying);
+            Exiled.Events.Handlers.Player.Verified -= new CustomEventHandler<VerifiedEventArgs>(OnStaticVerified);
+            Exiled.Events.Handlers.Player.Destroying -= new CustomEventHandler<DestroyingEventArgs>(OnStaticDestroying);
         }
 
         private static void OnStaticVerified(VerifiedEventArgs args)
         {
-            new FramePlayer(args.Player);
+            Load(args.Player)!.UpdateShowInfo();
         }
         private static void OnStaticDestroying(DestroyingEventArgs args)
         {
             FramePlayer fPlayer = args.Player.ToFPlayer();
-            fPlayer.Invalid();
+            if (!fPlayer.IsInvalid)
+            {
+                fPlayer.Invalid();
+            }
         }
 
         #endregion
@@ -212,7 +217,6 @@ namespace YongAnFrame.Features.Players
             UI = new(this);
             CustomAlgorithm = this;
             Events.Handlers.FramePlayer.OnFramePlayerCreated(new FramePlayerCreatedEventArgs(this));
-            UpdateShowInfo();
         }
 
         /// <summary>
@@ -412,7 +416,7 @@ namespace YongAnFrame.Features.Players
         {
             if (player.IsNPC)
             {
-                return new(player.ToFPlayer())
+                return new(player)
                 {
                     Level = 1,
                     Exp = 0,
@@ -446,6 +450,7 @@ namespace YongAnFrame.Features.Players
                             }
                         }
                     }
+
                     framePlayer = new(player)
                     {
                         Level = (ulong)reader["Level"],
@@ -462,7 +467,7 @@ namespace YongAnFrame.Features.Players
                 Log.Error($"数据库查找FramePlayer数据异常({player.UserId}) 错误原因:{text}");
                 if (YongAnFramePlugin.Instance.Config.IsMySqlErrorKick)
                 {
-                    player.Kick("不要慌张！你的数据库数据可能存在异常，为了保证你的游戏数据不被覆盖，你已被踢出服务器!\n请将错误联系到管理员(数据库查找FramePlayer数据异常)");
+                    player.Kick("不要慌张！你的数据库数据可能存在异常，为了保证你的游戏数据不被覆盖，你已被踢出服务器！\n请将错误联系到管理员(数据库查找FramePlayer数据异常)");
                 }
                 return null;
             }
@@ -506,6 +511,7 @@ namespace YongAnFrame.Features.Players
                     return null;
                 }
             }
+
             return framePlayer;
         }
 

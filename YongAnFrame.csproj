@@ -8,13 +8,12 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <NeutralLanguage>zh-Hans</NeutralLanguage>
     <SignAssembly>False</SignAssembly>
-    <VersionPrefix>1.0.0-beta7</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
+	<VersionSuffix>beta8</VersionSuffix>
     <Authors>YongAn404</Authors>
     <Company>$(Authors)</Company>
     <Copyright>Copyright © YongAn404</Copyright>
     <Title>$(AssemblyName)</Title>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
@@ -38,6 +37,7 @@
     <None Include=".github\workflows\dev.yml" />
     <None Include=".github\workflows\docs.yml" />
     <None Include=".github\workflows\master.yml" />
+    <None Include="bin\Debug\net48\HintServiceMeow-Exiled.dll" />
   </ItemGroup>
   
   <ItemGroup>
@@ -52,10 +52,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExMod.Exiled" Version="9.10.0" />
-    <PackageReference Include="Lib.Harmony" Version="2.4.1" />
-    <PackageReference Include="MengXinSheQu.AudioApi" Version="0.0.6" />
-    <PackageReference Include="MySqlConnector" Version="2.4.0" />
+    <PackageReference Include="ExMod.Exiled" Version="9.12.0" />
+    <PackageReference Include="Lib.Harmony" Version="2.4.2" />
+    <PackageReference Include="MengXinSheQu.AudioApi" Version="0.0.9-pre" />
+    <PackageReference Include="MySqlConnector" Version="2.5.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp-firstpass">

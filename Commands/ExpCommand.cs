@@ -1,4 +1,4 @@
-﻿using CommandSystem;
+using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System;
@@ -39,7 +39,7 @@ namespace YongAnFrame.Commands
             {
                 if (arguments.Count >= 1)
                 {
-                    Player.Get(arguments.Array[1]).ToFPlayer().Level += ulong.Parse(arguments.Array[2]);
+                    Player.Get(arguments.Array[1]).ToFPlayer().AddExp(ulong.Parse(arguments.Array[2]), "管理员签发");
                     response = "OK";
                     return true;
                 }

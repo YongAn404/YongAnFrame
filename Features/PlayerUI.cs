@@ -1,4 +1,5 @@
-﻿using HintServiceMeow.Core.Enum;
+using Exiled.API.Features.Waves;
+using HintServiceMeow.Core.Enum;
 using HintServiceMeow.Core.Models.Hints;
 using HintServiceMeow.Core.Utilities;
 using MEC;
@@ -37,7 +38,7 @@ namespace YongAnFrame.Features
         #region Hint
         private readonly Hint versionHint = new()
         {
-            Text = "YongAnFrame 1.0.0-beta7",
+            Text = "YongAnFrame 1.0.0-beta8",
             FontSize = 20,
             Alignment = HintAlignment.Center,
             YCoordinateAlign = HintVerticalAlign.Top,
@@ -54,13 +55,17 @@ namespace YongAnFrame.Features
         {
             FontSize = 20,
             Alignment = HintAlignment.Right,
-            YCoordinate = 400
+            YCoordinate = 600
         };
         private readonly Hint messageHint = new()
         {
             FontSize = 20,
             Alignment = HintAlignment.Left,
-            YCoordinate = 400
+            YCoordinate = 600
+        };
+        public readonly Hint waveTimerHint = new()
+        {
+            YCoordinate = 190
         };
         #endregion
 
@@ -68,7 +73,7 @@ namespace YongAnFrame.Features
         {
             while (true)
             {
-
+                UpdateWaveTimerUI();
 
                 for (int i = 0; i < MessageList.Count; i++)
                 {
@@ -78,8 +83,8 @@ namespace YongAnFrame.Features
                         MessageList.Remove(message);
                         i--;
                     }
-                    UpdateMessageUI();
                 }
+                UpdateMessageUI();
 
                 bool isUpdate = false;
 
@@ -107,6 +112,20 @@ namespace YongAnFrame.Features
             UpdateCustomRoleUI();
             UpdateMessageUI();
             UpdateChatUI();
+            UpdateWaveTimerUI();
+        }
+
+        public void UpdateWaveTimerUI()
+        {
+            if (FPlayer.ExPlayer.IsDead)
+            {
+                waveTimerHint.Text = $"<color=blue>下一波九尾狐刷新：{(int)WaveTimer.GetWaveTimers()[0].TimeLeft.TotalSeconds}</color>\n" +
+        $"<color=green>下一波混沌刷新：{(int)WaveTimer.GetWaveTimers()[1].TimeLeft.TotalSeconds}</color>";
+            }
+            else
+            {
+                waveTimerHint.Text = null;
+            }
         }
 
         /// <summary>
@@ -162,12 +181,13 @@ namespace YongAnFrame.Features
             FPlayer = fPlayer;
             MessageList = new(7, UpdateMessageUI);
             ChatList = new(7, UpdateChatUI);
-            coroutine = Timing.RunCoroutine(Timer());
-            PlayerDisplay = PlayerDisplay.Get(referenceHub: fPlayer);
+            PlayerDisplay = PlayerDisplay.Get(FPlayer.ExPlayer.ReferenceHub);
             PlayerDisplay.AddHint(customRoleHint);
             PlayerDisplay.AddHint(chatHint);
             PlayerDisplay.AddHint(messageHint);
             PlayerDisplay.AddHint(versionHint);
+            PlayerDisplay.AddHint(waveTimerHint);
+            coroutine = Timing.RunCoroutine(Timer());
         }
         /// <summary>
         /// 解构方法
